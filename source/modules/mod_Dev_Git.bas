@@ -1,11 +1,10 @@
-Attribute VB_Name = "mod_Dev_Git"
 Option Compare Database
 Option Explicit
 
 ' =================================
-' MODULE:       mod_Git
+' MODULE:       mod_Dev_Git
 ' Level:        Development module
-' Version:      1.02
+' Version:      1.05
 '
 ' Description:  Git related functions & procedures for version control
 '
@@ -13,8 +12,13 @@ Option Explicit
 ' Revisions:    BLC - 2/12/2015 - 1.00 - initial version
 '               BLC - 5/27/2015 - 1.01 - renamed to note as development module
 '               BLC - 6/30/2015 - 1.02 - added error handling to FieldTypeName()
-' =================================
-
+'               BLC - 6/24/2016 - 1.03 - replaced Exit_Function > Exit_Handler
+'               BLC - 1/24/2017 - 1.04 - shifted documentation functions to mod_Dev_Document
+'                                        this includes:
+'                                        GetDescriptions(),TableInfo(),
+'                                        GetDescrip(), DocumentDb()
+' -------------------------------------------------------------------------------
+'               BLC - 9/27/2017  - 1.05 - moved to NCPN_dev
 ' ===================================================================================
 '  NOTE:
 '  To regenerate components backed up w/ functions using SaveAsText
@@ -42,7 +46,7 @@ Option Explicit
 ' ---------------------------------
 Public Function ExportVBComponent(VBComp As VBIDE.VBComponent, _
                 FolderName As String, _
-                Optional fileName As String, _
+                Optional FileName As String, _
                 Optional OverwriteExisting As Boolean = True) As Boolean
 On Error GoTo Err_Handler
 
@@ -53,45 +57,45 @@ On Error GoTo Err_Handler
     ' appropriate extension.
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Dim Extension As String
-    Dim FName As String
+    Dim fName As String
     Extension = GetFileExtension(VBComp:=VBComp)
-    If Trim(fileName) = vbNullString Then
-        FName = VBComp.name & Extension
+    If Trim(FileName) = vbNullString Then
+        fName = VBComp.Name & Extension
     Else
-        FName = fileName
-        If InStr(1, FName, ".", vbBinaryCompare) = 0 Then
-            FName = FName & Extension
+        fName = FileName
+        If InStr(1, fName, ".", vbBinaryCompare) = 0 Then
+            fName = fName & Extension
         End If
     End If
     
     If StrComp(Right(FolderName, 1), "\", vbBinaryCompare) = 0 Then
-        FName = FolderName & FName
+        fName = FolderName & fName
     Else
-        FName = FolderName & "\" & FName
+        fName = FolderName & "\" & fName
     End If
     
-    If Dir(FName, vbNormal + vbHidden + vbSystem) <> vbNullString Then
+    If dir(fName, vbNormal + vbHidden + vbSystem) <> vbNullString Then
         If OverwriteExisting = True Then
-            Kill FName
+            Kill fName
         Else
             ExportVBComponent = False
             Exit Function
         End If
     End If
     
-    VBComp.Export fileName:=FName
+    VBComp.Export FileName:=fName
     ExportVBComponent = True
 
-Exit_Function:
+Exit_Handler:
     Exit Function
     
 Err_Handler:
     Select Case Err.Number
       Case Else
         MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
-            "Error encountered (#" & Err.Number & " - ExportVBComponent[mod_Git])"
+            "Error encountered (#" & Err.Number & " - ExportVBComponent[mod_Dev_Git])"
     End Select
-    Resume Exit_Function
+    Resume Exit_Handler
 End Function
     
 ' ---------------------------------
@@ -129,16 +133,16 @@ On Error GoTo Err_Handler
                 GetFileExtension = ".bas"
         End Select
 
-Exit_Function:
+Exit_Handler:
     Exit Function
     
 Err_Handler:
     Select Case Err.Number
       Case Else
         MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
-            "Error encountered (#" & Err.Number & " - GetFileExtension[mod_Git])"
+            "Error encountered (#" & Err.Number & " - GetFileExtension[mod_Dev_Git])"
     End Select
-    Resume Exit_Function
+    Resume Exit_Handler
 End Function
 
 ' ---------------------------------
@@ -168,7 +172,7 @@ End Function
 Public Sub DocDatabase(Optional Path As String = "")
     
     If IsBlank(Path) Then
-        Path = Application.CurrentProject.Path & "\" & Application.CurrentProject.name & " - exploded view\"
+        Path = Application.CurrentProject.Path & "\" & Application.CurrentProject.Name & " - exploded view\"
     End If
 
 On Error Resume Next
@@ -190,32 +194,32 @@ On Error GoTo Err_Handler
 
     Set cnt = dbs.Containers("Forms")
     For Each doc In cnt.Documents
-        Application.SaveAsText acForm, doc.name, Path & "\Forms\" & doc.name & ".txt"
+        Application.SaveAsText acForm, doc.Name, Path & "\Forms\" & doc.Name & ".txt"
     Next doc
 
     Set cnt = dbs.Containers("Reports")
     For Each doc In cnt.Documents
-        Application.SaveAsText acReport, doc.name, Path & "\Reports\" & doc.name & ".txt"
+        Application.SaveAsText acReport, doc.Name, Path & "\Reports\" & doc.Name & ".txt"
     Next doc
 
     Set cnt = dbs.Containers("Scripts")
     For Each doc In cnt.Documents
-        Application.SaveAsText acMacro, doc.name, Path & "\Scripts\" & doc.name & ".txt"
+        Application.SaveAsText acMacro, doc.Name, Path & "\Scripts\" & doc.Name & ".txt"
     Next doc
 
     Set cnt = dbs.Containers("Modules")
     For Each doc In cnt.Documents
-        Application.SaveAsText acModule, doc.name, Path & "\Modules\" & doc.name & ".txt"
+        Application.SaveAsText acModule, doc.Name, Path & "\Modules\" & doc.Name & ".txt"
     Next doc
 
     Dim intfile As Long
-    Dim fileName As String
-    For i = 0 To dbs.QueryDefs.count - 1
-         Application.SaveAsText acQuery, dbs.QueryDefs(i).name, Path & "\Queries\" & dbs.QueryDefs(i).name & ".txt"
-         fileName = Path & "\Queries(SQL)\" & dbs.QueryDefs(i).name & ".txt"
+    Dim FileName As String
+    For i = 0 To dbs.QueryDefs.Count - 1
+         Application.SaveAsText acQuery, dbs.QueryDefs(i).Name, Path & "\Queries\" & dbs.QueryDefs(i).Name & ".txt"
+         FileName = Path & "\Queries(SQL)\" & dbs.QueryDefs(i).Name & ".txt"
          intfile = FreeFile()
-         Open fileName For Output As #intfile
-         Print #intfile, dbs.QueryDefs(i).sql
+         Open FileName For Output As #intfile
+         Print #intfile, dbs.QueryDefs(i).SQL
          Close #intfile
     Next i
 
@@ -223,7 +227,7 @@ On Error GoTo Err_Handler
     Set cnt = Nothing
     Set dbs = Nothing
 
-Exit_Sub:
+Exit_Handler:
     Debug.Print "Done."
     Exit Sub
     
@@ -231,9 +235,9 @@ Err_Handler:
     Select Case Err.Number
       Case Else
         MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
-            "Error encountered (#" & Err.Number & " - DocDatabase[mod_Git])"
+            "Error encountered (#" & Err.Number & " - DocDatabase[mod_Dev_Git])"
     End Select
-    Resume Exit_Sub
+    Resume Exit_Handler
 End Sub
 
 ' ---------------------------------
@@ -254,15 +258,15 @@ End Sub
 Public Sub RecreateDatabase()
 On Error GoTo Err_Handler
     Dim myFile As Object '??
-    Dim folder As Object '??
+    Dim Folder As Object '??
     Dim FSO As Object '??
     Dim objecttype As String, objectname As String
     Dim WScript As Object '??
     Dim oApplication As Object '??
     
-    For Each myFile In folder.Files
-        objecttype = FSO.GetExtensionName(myFile.name)
-        objectname = FSO.GetBaseName(myFile.name)
+    For Each myFile In Folder.Files
+        objecttype = FSO.GetExtensionName(myFile.Name)
+        objectname = FSO.GetBaseName(myFile.Name)
         WScript.Echo "  " & objectname & " (" & objecttype & ")"
     
         If (objecttype = "form") Then
@@ -279,7 +283,7 @@ On Error GoTo Err_Handler
         
     Next
     
-Exit_Sub:
+Exit_Handler:
     Debug.Print "Done."
     Exit Sub
     
@@ -287,9 +291,9 @@ Err_Handler:
     Select Case Err.Number
       Case Else
         MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
-            "Error encountered (#" & Err.Number & " - RecreateDatabase[mod_Git])"
+            "Error encountered (#" & Err.Number & " - RecreateDatabase[mod_Dev_Git])"
     End Select
-    Resume Exit_Sub
+    Resume Exit_Handler
 End Sub
 
 ' ---------------------------------
@@ -315,7 +319,7 @@ End Sub
 ' ---------------------------------
 Public Function SetPropertyDAO(obj As Object, strPropertyName As String, intType As Integer, _
     varValue As Variant, Optional strErrMsg As String) As Boolean
-On Error GoTo ErrHandler
+On Error GoTo errHandler
     'Purpose:   Set a property for an object, creating if necessary.
     'Arguments: obj = the object whose property should be set.
     '           strPropertyName = the name of the property to set.
@@ -333,9 +337,9 @@ On Error GoTo ErrHandler
 ExitHandler:
     Exit Function
 
-ErrHandler:
-    strErrMsg = strErrMsg & obj.name & "." & strPropertyName & " not set to " & _
-        varValue & ". Error encountered (#" & Err.Number & " - SetPropertyDAO[mod_Git])" & _
+errHandler:
+    strErrMsg = strErrMsg & obj.Name & "." & strPropertyName & " not set to " & _
+        varValue & ". Error encountered (#" & Err.Number & " - SetPropertyDAO[mod_Dev_Git])" & _
         Err.Number & " - " & Err.Description & vbCrLf
     
     Resume ExitHandler
@@ -369,127 +373,6 @@ Public Function HasProperty(obj As Object, strPropName As String) As Boolean
 End Function
 
 ' ---------------------------------
-' FUNCTION:     GetDescriptions
-' Description:  Returns table descriptions
-' Assumptions:  -
-' Parameters:   db - name of database (string)
-' Returns:      descriptions - table descriptions (string)
-' Throws:       none
-' References:   -
-' Source/date:
-' http://databases.aspfaq.com/schema-tutorials/schema-how-do-i-show-the-description-property-of-a-column.html
-'
-' http://stackoverflow.com/questions/17555174/how-to-loop-through-all-tables-in-an-ms-access-db
-' Allen Browne,
-' http://allenbrowne.com/func-06.html
-' Adapted:      Bonnie Campbell, February 13, 2015 - for NCPN tools
-' Revisions:
-'   BLC - 2/13/2015 - initial version
-' ---------------------------------
-Public Function GetDescriptions(db As String) As String
-On Error Resume Next
-    Dim Catalog As AccessObject
-    Dim dsc As String
-    Dim tbl As AccessObject
-    Dim tabledefs As Collection '??
-    
-    Set Catalog = CreateObject("ADOX.Catalog")
-    Catalog.ActiveConnection = "Provider=Microsoft.Jet.OLEDB.4.0;" & _
-        "Data Source=\" & db & ""
-        '"Data Source=<path>\<file>.mdb"
- 
-    'iterate through tables, then table columns to retrieve descriptions
-    For Each tbl In Catalog.Tables
-        Debug.Print tbl.name
-    Next
- 
-    dsc = Catalog.Tables("table_name").Columns("column_name").Properties("Description").Value
- 
-    For Each tbl In tabledefs
-        Debug.Print tbl.name
-    Next
-    
-    GetDescriptions = dsc
- 
- '   If Err.Number <> 0 Then
-  '      Response.Write "&lt;" & Err.Description & "&gt;"
-   ' Else
-   '     Response.Write "Description = " & dsc
-   ' End If
-    Set Catalog = Nothing
-End Function
-
-' ---------------------------------
-' FUNCTION:     TableInfo
-' Description:  Returns table descriptions
-' Assumptions:  -
-' Parameters:   strTableName - name of table
-' Returns:      -
-' Throws:       none
-' References:   -
-' Source/date:
-' Allen Browne, April 2010
-' http://allenbrowne.com/func-06.html
-' Adapted:      Bonnie Campbell, February 13, 2015 - for NCPN tools
-' Revisions:
-'   BLC - 2/13/2015 - initial version
-' ---------------------------------
-Function TableInfo(strTableName As String)
-On Error GoTo TableInfoErr
-   ' Purpose:   Display the field names, types, sizes and descriptions for a table.
-   ' Argument:  Name of a table in the current database.
-   Dim db As DAO.Database
-   Dim tdf As DAO.TableDef
-   Dim fld As DAO.Field
-   
-   Set db = CurrentDb()
-   Set tdf = db.tabledefs(strTableName)
-   Debug.Print "FIELD NAME", "FIELD TYPE", "SIZE", "DESCRIPTION"
-   Debug.Print "==========", "==========", "====", "==========="
-
-   For Each fld In tdf.Fields
-      Debug.Print fld.name,
-      Debug.Print FieldTypeName(fld),
-      Debug.Print fld.Size,
-      Debug.Print GetDescrip(fld)
-   Next
-   Debug.Print "==========", "==========", "====", "==========="
-
-TableInfoExit:
-   Set db = Nothing
-   Exit Function
-
-TableInfoErr:
-   Select Case Err
-   Case 3265&  'Table name invalid
-      MsgBox strTableName & " table doesn't exist"
-   Case Else
-      Debug.Print "TableInfo() Error " & Err & ": " & Error
-   End Select
-   Resume TableInfoExit
-End Function
-
-' ---------------------------------
-' FUNCTION:     GetDescrip
-' Description:  Returns table descriptions
-' Assumptions:  -
-' Parameters:   obj - database object
-' Returns:      description - object description (string)
-' Throws:       none
-' References:   -
-' Source/date:
-' Allen Browne, April 2010
-' http://allenbrowne.com/func-06.html
-' Adapted:      Bonnie Campbell, February 13, 2015 - for NCPN tools
-' Revisions:
-'   BLC - 2/13/2015 - initial version
-' ---------------------------------
-Function GetDescrip(obj As Object) As String
-    On Error Resume Next
-    GetDescrip = obj.Properties("Description")
-End Function
-
-' ---------------------------------
 ' FUNCTION:     FieldTypeName
 ' Description:  Converts the numeric results of DAO Field.Type to text
 ' Assumptions:  -
@@ -505,7 +388,7 @@ End Function
 '   BLC - 2/13/2015 - initial version
 '   BLC - 6/30/2015 - added error handling
 ' ---------------------------------
-Function FieldTypeName(fld As DAO.Field) As String
+Public Function FieldTypeName(fld As DAO.field) As String
 On Err GoTo Err_Handler
 
     Dim strReturn As String    'Name to return
@@ -564,17 +447,17 @@ On Err GoTo Err_Handler
     End Select
 
     FieldTypeName = strReturn
-    
-Exit_Function:
+
+Exit_Handler:
     Exit Function
-    
+
 Err_Handler:
     Select Case Err.Number
       Case Else
         MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
-            "Error encountered (#" & Err.Number & " - FieldTypeName[mod_Git])"
+            "Error encountered (#" & Err.Number & " - FieldTypeName[mod_Dev_Git])"
     End Select
-    Resume Exit_Function
+    Resume Exit_Handler
 End Function
 
 ' ---------------------------------
@@ -653,15 +536,14 @@ On Err GoTo Err_Handler
     GetFieldTypeName = strReturn
 
 
-Exit_Function:
+Exit_Handler:
     Exit Function
     
 Err_Handler:
     Select Case Err.Number
       Case Else
         MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
-            "Error encountered (#" & Err.Number & " - GetFieldTypeName[mod_Git])"
+            "Error encountered (#" & Err.Number & " - GetFieldTypeName[mod_Dev_Git])"
     End Select
-    Resume Exit_Function
+    Resume Exit_Handler
 End Function
-
