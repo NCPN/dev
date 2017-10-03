@@ -4,7 +4,7 @@ Option Explicit
 ' =================================
 ' MODULE:       mod_Dev_Documentation
 ' Level:        Development module
-' Version:      1.02
+' Version:      1.03
 '
 ' Description:  Debugging related functions & procedures for database documentation
 '
@@ -13,7 +13,40 @@ Option Explicit
 '               BLC - 9/13/2017 - 1.01 - added ReferenceProperties()
 ' -------------------------------------------------------------------------------
 '               BLC - 9/27/2017 - 1.02 - moved to NCPN_dev
+'               BLC - 10/3/2017 - 1.03 - added ObjectType enum, GetObjectList(),
+'                                        GetProjectDetails() documentation
 ' =================================
+
+' ---------------------------------
+' ENUM:     ObjectType
+' Description:  Database objects
+' Note: Since there are gaps in this enum so iteration as below is *not* possible
+'
+'           For N = ObjectType.[_Last] To ObjectType.[_First]
+'                Debug.Print N
+'           Next
+'
+' Source/date:
+'   Daniel Pineault (CARDA Consultants Inc., www.cardaconsultants.com), June 12, 2010
+'   https://www.devhut.net/2010/06/12/ms-access-listing-of-database-objects/
+'   Chip Pearson (Pearson Software Consulting), March 12, 2008
+'   http://www.cpearson.com/excel/Enums.aspx
+' Adapted:      Bonnie Campbell, October 3, 2017 - for NCPN tools
+' Revisions:
+'   BLC - 10/3/2017 - initial version
+' ---------------------------------
+Enum ObjectType
+    [_First] = 1
+    Tables_Local = 1
+    Tables_Linked_ODBC = 4
+    Tables_Linked = 6
+    Queries = 5
+    Forms = -32768
+    Reports = -32764
+    Macros = -32766
+    Modules = -32761
+    [_Last] = -32761
+End Enum
 
 ' ---------------------------------
 ' FUNCTION:     GetDescriptions
@@ -369,7 +402,7 @@ Err_Handler:
 End Sub
 
 ' ---------------------------------
-' SUB:          ReferenceProperties
+' FUNCTION:     ReferenceProperties
 ' Description:  Print (debug) reference properties
 ' Assumptions:  -
 ' Parameters:   -
@@ -410,6 +443,251 @@ Err_Handler:
       Case Else
         MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
             "Error encountered (#" & Err.Number & " - GetDescrip[mod_Dev_Document])"
+    End Select
+    Resume Exit_Handler
+End Function
+
+' ---------------------------------
+' FUNCTION:     GetProjectDetails
+' Description:  Creates a text file listing project modules, procedures, functions,
+'               subroutines, and properties
+' Assumptions:  -
+' Parameters:   IncludeCounts - include line counts (optional, default false, boolean)
+' Returns:      text
+' Throws:       none
+' References:   -
+' Source/date:
+'   Daniel Pineault (CARDA Consultants Inc., www.cardaconsultants.com), June 4, 2011
+'   https://www.devhut.net/2011/06/04/vba-vbe-enumerate-modules-procedures-and-line-count/
+' Adapted:      Bonnie Campbell, September 29, 2017 - for NCPN tools
+' Revisions:
+'   BLC - 9/29/2017 - initial version
+'   BLC - 10/3/2017 - adjusted header to include project description & date
+' ---------------------------------
+Public Function GetProjectDetails(Optional IncludeCounts As Boolean = False)
+On Error GoTo Err_Handler
+    Dim vbProj                As VBIDE.VBProject
+    Dim vbComp                As VBIDE.VBComponent
+    Dim vbMod                 As VBIDE.CodeModule
+    Dim pk                    As VBIDE.vbext_ProcKind
+    Dim sProcName             As String
+    Dim strFile               As String
+    Dim iCounter              As Long
+    Dim FileNumber            As Integer
+    Dim bFileClosed           As Boolean
+    Dim strKind               As String
+    Const vbNormalFocus = 1
+    
+    'documentation file
+    strFile = Application.CurrentProject.Path & "\" & CurrentProject.Name & "_ProjectDetails.txt"
+    If Len(Dir(strFile)) > 0 Then Kill strFile
+    FileNumber = FreeFile                           'Get unused file number
+    Open strFile For Append As #FileNumber          'Create file name
+    
+'    Print #FileNumber, String(80, "=")
+'    Print #FileNumber, "VBA Project Name: " & Application.VBE.ActiveVBProject.Name
+'    Print #FileNumber, "Description:      " & Application.VBE.ActiveVBProject.Description
+'    Print #FileNumber, String(80, "-")
+    Print #FileNumber, "Database:         " & Application.CurrentProject.Name
+    Print #FileNumber, "Db Path:          " & Application.CurrentProject.Path
+    Print #FileNumber, String(80, "=")
+    Print #FileNumber, "As of:            " & Now()
+    Print #FileNumber, String(80, "=")
+    
+'    Print #FileNumber, "Database: " & Application.CurrentProject.Name
+'    Print #FileNumber, "Database Path: " & Application.CurrentProject.Path
+'    Print #FileNumber, String(80, "*")
+'    Print #FileNumber, String(80, "*")
+    Print #FileNumber, ""
+ 
+    'iterate through projects
+    For Each vbProj In Application.VBE.VBProjects
+        Print #FileNumber, String(80, "*")
+        Print #FileNumber, "VBA Project Name: " & Application.VBE.ActiveVBProject.Name
+        Print #FileNumber, "Description:      " & Application.VBE.ActiveVBProject.Description
+        Print #FileNumber, String(80, "*")
+'        Print #FileNumber, "VBA Project Name: " & vbProj.Name
+        
+        'iterate through modules
+        For Each vbComp In vbProj.VBComponents
+            Set vbMod = vbComp.CodeModule
+            
+            Print #FileNumber, "   " & vbComp.Name & _
+                IIf(IncludeCounts = True, " :: " & _
+                    vbMod.CountOfLines & " total lines", "")
+            Print #FileNumber, "   " & String(80, "*")
+            
+            iCounter = 1
+    
+            'iterate through procedures
+            Do While iCounter < vbMod.CountOfLines
+                sProcName = vbMod.ProcOfLine(iCounter, pk)
+                
+                Select Case pk
+        
+                    Case vbext_pk_Proc  'sub or function
+                        strKind = "SUB / FUNCTION: "
+                    Case vbext_pk_Get   'property get
+                        strKind = "PROPERTY GET: "
+                    Case vbext_pk_Let   'property let
+                        strKind = "PROPERTY LET: "
+                    Case vbext_pk_Set   'property set
+                        strKind = "PROPERTY SET: "
+                End Select
+                
+                If sProcName <> "" Then
+                    Print #FileNumber, "      " & _
+                        strKind & sProcName & _
+                        IIf(IncludeCounts = True, " :: " & _
+                            vbMod.ProcCountLines(sProcName, pk) & " lines", "")
+                    
+                    iCounter = iCounter + vbMod.ProcCountLines(sProcName, pk)
+                Else
+                    iCounter = iCounter + 1
+                End If
+            Loop
+            
+            Print #FileNumber, ""
+        Next vbComp
+    Next vbProj
+    
+    Close #FileNumber  'close file.
+    bFileClosed = True
+    
+    'Open the generated text file
+    Application.FollowHyperlink strFile
+ 
+Exit_Handler:
+    If bFileClosed = False Then Close #FileNumber   'close file
+    If Not vbMod Is Nothing Then Set vbMod = Nothing
+    If Not vbComp Is Nothing Then Set vbComp = Nothing
+    If Not vbProj Is Nothing Then Set vbProj = Nothing
+    Exit Function
+    
+Err_Handler:
+    Select Case Err.Number
+      Case Else
+        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+            "Error encountered (#" & Err.Number & " - GetProjectDetails[mod_Dev_Document])"
+    End Select
+    Resume Exit_Handler
+End Function
+
+' ---------------------------------
+' FUNCTION:     GetObjectList
+' Description:  Creates a list of project objects (see also ObjectType enum above)
+'
+'   Tables_Local = 1            Queries = 5             Macros = -32766
+'   Tables_Linked_ODBC = 4      Forms = -32768          Modules = -32761
+'   Tables_Linked = 6           Reports = -32764
+'
+' Assumptions:  -
+' Parameters:   ObjType - type of object to include (optional, default , long)
+' Returns:      text
+' Throws:       none
+' References:   -
+' Source/date:
+'   Daniel Pineault (CARDA Consultants Inc., www.cardaconsultants.com), June 12, 2010
+'   https://www.devhut.net/2010/06/12/ms-access-listing-of-database-objects/
+'   Chip Pearson (Pearson Software Consulting), March 12, 2008
+'   http://www.cpearson.com/excel/Enums.aspx
+' Adapted:      Bonnie Campbell, October 3, 2017 - for NCPN tools
+' Revisions:
+'   BLC - 10/3/2017 - initial version
+' ---------------------------------
+Public Function GetObjectList(ExportToFile As Boolean, _
+                             ObjType As Variant)
+On Error GoTo Err_Handler
+ 
+    Dim db          As DAO.Database
+    Dim rs          As DAO.Recordset
+    Dim strSQL      As String
+    Dim strText     As String
+    Dim strFile     As String
+    Dim FileNumber  As Integer
+    Dim strObjTypes As String
+ 
+    'include all ObjectTypes
+    strObjTypes = "(1, 4, 5, 6, -32761, -32764, -32766, -32768)"
+ 
+    'defaults
+    If ObjType = "ALL" Then
+    
+        'include all ObjectTypes
+        strObjTypes = " IN " & strObjTypes
+    
+    Else
+    
+        strObjTypes = "= " & ObjType
+    
+    End If
+    
+    strSQL = "SELECT MsysObjects.Name AS [ObjectName]" & vbCrLf & _
+        " FROM MsysObjects" & vbCrLf & _
+        " WHERE (((MsysObjects.Name Not Like '~*') And (MsysObjects.Name Not Like 'MSys*'))" & vbCrLf & _
+        "     AND (MsysObjects.Type" & strObjTypes & "))" & vbCrLf & _
+        " ORDER BY MsysObjects.Name;"
+    
+'    strSQL = "SELECT MsysObjects.Name AS [ObjectName]" & vbCrLf & _
+'           " FROM MsysObjects" & vbCrLf & _
+'           " WHERE (((MsysObjects.Name Not Like '~*') And (MsysObjects.Name Not Like 'MSys*'))" & vbCrLf & _
+'           "     AND (MsysObjects.Type=" & ObjType & "))" & vbCrLf & _
+'           " ORDER BY MsysObjects.Name;"
+    
+    Set db = CurrentDb
+    Set rs = db.OpenRecordset(strSQL, dbOpenSnapshot)
+    With rs
+        If .RecordCount <> 0 Then
+            Do While Not .EOF
+                If ExportToFile = True Then
+                    strText = strText & ![objectname] & vbCrLf
+                Else
+                    Debug.Print ![objectname]
+                End If
+                .MoveNext
+            Loop
+        End If
+    End With
+ 
+    If ExportToFile = True Then
+        
+        'documentation file
+        strFile = Application.CurrentProject.Path & "\" & CurrentProject.Name & "_ObjectList.txt"
+        If Len(Dir(strFile)) > 0 Then Kill strFile
+        FileNumber = FreeFile                           'Get unused file number
+        Open strFile For Append As #FileNumber          'Create file name
+        'Print #FileNumber, ""
+        Print #FileNumber, String(80, "=")
+        Print #FileNumber, "VBA Project Name: " & Application.VBE.ActiveVBProject.Name
+        Print #FileNumber, "Description:      " & Application.VBE.ActiveVBProject.Description
+        Print #FileNumber, String(80, "-")
+        Print #FileNumber, "Database:         " & Application.CurrentProject.Name
+        Print #FileNumber, "Db Path:          " & Application.CurrentProject.Path
+        Print #FileNumber, String(80, "=")
+        Print #FileNumber, "As of:            " & Now()
+        Print #FileNumber, String(80, "=")
+        Print #FileNumber, "OBJECTS:"
+        Print #FileNumber, String(80, "=")
+        Print #FileNumber, strText
+    
+        Close #FileNumber  'close file.
+        
+    End If
+ 
+Exit_Handler:
+    If Not rs Is Nothing Then
+        rs.Close
+        Set rs = Nothing
+    End If
+    If Not db Is Nothing Then Set db = Nothing
+    Exit Function
+    
+Err_Handler:
+    'Switch(Erl = 0, "", Erl <> 0, vbCrLf & "Line No: " & Erl)
+    Select Case Err.Number
+      Case Else
+        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+            "Error encountered (#" & Err.Number & " - GetObjectList[mod_Dev_Document])"
     End Select
     Resume Exit_Handler
 End Function

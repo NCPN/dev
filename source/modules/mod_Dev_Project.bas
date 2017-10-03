@@ -69,7 +69,7 @@ On Error GoTo Err_Handler
     End If
     
     'make directory if needed
-    If dir(DestDir, vbDirectory) = vbNullString Then MkDir DestDir
+    If Dir(DestDir, vbDirectory) = vbNullString Then MkDir DestDir
     
     Set oProj = Application.VBE.ActiveVBProject
     
@@ -97,7 +97,7 @@ On Error GoTo Err_Handler
                         
             'overwrite existing file?
             If Overwrite = True And _
-                dir(fName, vbNormal) <> vbNullString Then
+                Dir(fName, vbNormal) <> vbNullString Then
                 Kill (fName)
             End If
             

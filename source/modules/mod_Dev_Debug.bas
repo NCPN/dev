@@ -133,7 +133,7 @@ End Sub
 ' Parameters:   strDbPath - new database path (string) (e.g. "C:\__TEST_DATA\mydb.accdb")
 ' Returns:      -
 ' Throws:       none
-' References:   -
+' References:   ParseFileName() NCPN_framework mod_Strings
 ' Source/date:  Bonnie Campbell, May 27, 2015 - for NCPN tools
 ' Adapted:      -
 ' Revisions:
@@ -145,7 +145,7 @@ On Error GoTo Err_Handler
     Dim strDbFile As String, strSQL As String
     
     'get db file name
-    strDbFile = ParseFileName(strDbPath)
+'    strDbFile = ParseFileName(strDbPath)
     
     DoCmd.SetWarnings False
     
@@ -179,7 +179,7 @@ End Sub
 ' Parameters:   strDbPath - new database path (string) (e.g. "C:\__TEST_DATA\mydb.accdb")
 ' Returns:      -
 ' Throws:       none
-' References:   -
+' References:   ParseFileName() NCPN_framework mod_Strings
 ' Source/date:  Bonnie Campbell, May 27, 2015 - for NCPN tools
 ' Adapted:      -
 ' Revisions:
@@ -194,7 +194,7 @@ On Error GoTo Err_Handler
     ChangeTSysDb strDbPath
     
     'get db name
-    strDb = ParseFileName(strDbPath)
+'    strDb = ParseFileName(strDbPath)
     
     'iterate through linked tables w/in tsys_Link_Tables
     Set rs = CurrentDb.OpenRecordset("tsys_Link_Tables", dbOpenDynaset)
@@ -273,18 +273,18 @@ On Error GoTo Err_Handler
 '    'test parsing
 '    ParseFileName ("C:\___TEST_DATA\test_BE_new\Invasives_be.accdb")
 
-    Dim p_oTask As Task
-    
-    Set p_oTask = New Task
-    With p_oTask
-        .TaskType = "TaskType.Photo"
-        .Task = "Testing description"
-        .Status = Status.Opened
-        .Priority = Priority.high
-        .RequestedByID = 3
-        .CompletedByID = 1
-        .AddTask
-    End With
+'    Dim p_oTask As Task
+'
+'    Set p_oTask = New Task
+'    With p_oTask
+'        .TaskType = "TaskType.Photo"
+'        .Task = "Testing description"
+'        .Status = Status.Opened
+'        .Priority = Priority.high
+'        .RequestedByID = 3
+'        .CompletedByID = 1
+'        .AddTask
+'    End With
 
 Exit_Handler:
     Exit Sub
@@ -742,8 +742,8 @@ Public Sub runtest()
     Dim tbl As String 'DAO.TableDef
 
     'Set tbl = CurrentDb.TableDefs("DINO_2014_SpeciesCover_by_Route_Result")
-    tbl = "DINO_2014_SpeciesCover_by_Route_Result"
-    CollapseRows tbl
+'    tbl = "DINO_2014_SpeciesCover_by_Route_Result"
+'    CollapseRows tbl
 
 '    Dim sfc As New Surface
 '
@@ -788,12 +788,12 @@ Public Sub runtest()
 '
 '    End With
     
-    Dim s As Surface
-    
-    With s
-        .OrigColumnName = "Dead_Wood"
-        .ID = s.GetIDFromColName
-    End With
+'    Dim s As Surface
+'
+'    With s
+'        .OrigColumnName = "Dead_Wood"
+'        .ID = s.GetIDFromColName
+'    End With
     
 End Sub
 
@@ -919,7 +919,7 @@ On Error GoTo Err_Handler
 
     Dim ModuleFilePath As String, ModuleFile As String
    
-    ModuleFile = dir(strPath, vbNormal)
+    ModuleFile = Dir(strPath, vbNormal)
     
     While ModuleFile <> ""
     
@@ -931,7 +931,7 @@ On Error GoTo Err_Handler
         End If
         
         'call Dir without params to get the next file in strPath
-        ModuleFile = dir
+        ModuleFile = Dir
     Wend
 
 Exit_Handler:
@@ -962,7 +962,7 @@ Public Function test()
     'HandleDependentQueries "41", "run"
     'HandleDependentQueries "68,60,69,70,71,72,73,74,75", "run"
     'HandleDependentQueries "68,60,69,70,71,72,73,74,75", "remove"
-    RemoveTemplateQueries
+'    RemoveTemplateQueries
  
     'Set g_AppTemplates = Nothing
     'GetTemplates
@@ -1354,7 +1354,7 @@ Public Sub DoIt()
 
 'GetTemplate "i_event"
 
-GetTemplate ("s_app_releases")
+'GetTemplate ("s_app_releases")
 
 End Sub
 
@@ -1530,44 +1530,44 @@ If img.Properties.Exists("40095") Then
     s = s & "Subject = " & v.String & vbCrLf
 End If
 
-Dim vecProperty As WIA.Vector
-Dim propEach As WIA.Property
-
-With img
-    For Each propEach In .Properties
-            Select Case propEach.Name
-                Case "40091"
-                    Set vecProperty = propEach.Value
-                    Debug.Print "Title = " & vecProperty.String
-
-                Case "40092"
-                    Set vecProperty = propEach.Value
-                    Debug.Print "Comment = " & vecProperty.String
-
-                Case "40093"
-                    Set vecProperty = propEach.Value
-                    Debug.Print "Author = " & vecProperty.String
-
-                Case "40094"
-                    Set vecProperty = propEach.Value
-                    Debug.Print "Keywords = " & vecProperty.String
-
-                Case "40095"
-                    Set vecProperty = propEach.Value
-                    Debug.Print "Subject = " & vecProperty.String
-
-                Case Else
-                'Bob77, May 9, 2011
-                'http://stackoverflow.com/questions/5927828/extract-properties-from-the-image-file
-                    
-                    If Not (propEach.Name = "ChrominanceTable" Or _
-                            propEach.Name = "LuminanceTable") Then
-                    If Not varType(propEach.Value) = vbObject Then _
-                    Debug.Print propEach.Name & " (" & propEach.PropertyID & ") ="; CStr(propEach.Value)
-                    End If
-            End Select
-        Next
-End With
+'Dim vecProperty As WIA.Vector
+'Dim propEach As WIA.Property
+'
+'With img
+'    For Each propEach In .Properties
+'            Select Case propEach.Name
+'                Case "40091"
+'                    Set vecProperty = propEach.Value
+'                    Debug.Print "Title = " & vecProperty.String
+'
+'                Case "40092"
+'                    Set vecProperty = propEach.Value
+'                    Debug.Print "Comment = " & vecProperty.String
+'
+'                Case "40093"
+'                    Set vecProperty = propEach.Value
+'                    Debug.Print "Author = " & vecProperty.String
+'
+'                Case "40094"
+'                    Set vecProperty = propEach.Value
+'                    Debug.Print "Keywords = " & vecProperty.String
+'
+'                Case "40095"
+'                    Set vecProperty = propEach.Value
+'                    Debug.Print "Subject = " & vecProperty.String
+'
+'                Case Else
+'                'Bob77, May 9, 2011
+'                'http://stackoverflow.com/questions/5927828/extract-properties-from-the-image-file
+'
+'                    If Not (propEach.Name = "ChrominanceTable" Or _
+'                            propEach.Name = "LuminanceTable") Then
+'                    If Not varType(propEach.Value) = vbObject Then _
+'                    Debug.Print propEach.Name & " (" & propEach.PropertyID & ") ="; CStr(propEach.Value)
+'                    End If
+'            End Select
+'        Next
+'End With
 
 Debug.Print s
 
@@ -1590,26 +1590,26 @@ Public Sub DoItAgain()
 '
 '    a.Name = "my new array"
 
-    TempVars("ContactID") = 1
-    Dim c As New Location 'Person 'AppComment
-    
-    With c
-''        .Comment = "test comment from dev_debug"
-''        .CommentorID = 1
-''        .CommentType = "test"
-'        .FirstName = "Tsmeer"
-'        .LastName = "Mytest"
-'        .Email = "abcd@def.com"
-'        .Organization = "NCPN"
-'        .Username = "mylogin"
-'        .IsActive = 1
-'        .AccessLevel = 2
-        .LocationType = "P"
-        .LocationName = "X"
-        .HeadtoOrientDistance = 3
-        .HeadtoOrientBearing = 22
-        .SaveToDb False
-    End With
+'    TempVars("ContactID") = 1
+'    Dim c As New Location 'Person 'AppComment
+'
+'    With c
+'''        .Comment = "test comment from dev_debug"
+'''        .CommentorID = 1
+'''        .CommentType = "test"
+''        .FirstName = "Tsmeer"
+''        .LastName = "Mytest"
+''        .Email = "abcd@def.com"
+''        .Organization = "NCPN"
+''        .Username = "mylogin"
+''        .IsActive = 1
+''        .AccessLevel = 2
+'        .LocationType = "P"
+'        .LocationName = "X"
+'        .HeadtoOrientDistance = 3
+'        .HeadtoOrientBearing = 22
+'        .SaveToDb False
+'    End With
 
 End Sub
 
@@ -1706,7 +1706,7 @@ Public Sub ExecuteIt()
     
     Set rs = db.OpenRecordset("SELECT '';")
     
-    aryData = FetchDbTableFieldInfo("SurveyDataSourceFile")
+'    aryData = FetchDbTableFieldInfo("SurveyDataSourceFile")
     'use Array("",...) vs. Split() since array ==> variant array, split ==> string array
     aryFields = Array("Column|" & CLng(dbText) & "|25", _
                     "ColType|" & CLng(dbLong), _
@@ -1722,7 +1722,7 @@ Public Sub ExecuteIt()
     'Split("a,b,c,d,e",",") creates String array
 '    aryFields = Split("a,b,c,d,e,f,g,h,i", ",")
 
-    Set rs = ArrayToRecordset(aryFields, aryData, "|")
+'    Set rs = ArrayToRecordset(aryFields, aryData, "|")
 
     Debug.Print ""
 End Sub
@@ -1741,10 +1741,10 @@ Public Sub DoIt2()
         
         With qdf
         
-            'check if record exists in site
-            .SQL = GetTemplate(Template)
-        
-            Debug.Print .SQL
+'            'check if record exists in site
+'            .SQL = GetTemplate(Template)
+'
+'            Debug.Print .SQL
         End With
     End With
 End Sub
@@ -1769,7 +1769,7 @@ Public Sub CheckRS()
 '
 '    Set rs = CreateObject("Word.application")
 
-    Debug.Print IsRecordset(rs)
+'    Debug.Print IsRecordset(rs)
 
 End Sub
 
@@ -1870,7 +1870,7 @@ strSQL = "PARAMETERS csn TEXT(25), ltype TEXT(1), lname TEXT(100)," _
 & "Values" _
 & "([csn], [ltype], [lname], [dist], [brg], [lnotes], Now, [CID], Now, [LMID]);"
 
-GetParamsFromSQL (strSQL)
+'GetParamsFromSQL (strSQL)
 
 End Function
 
@@ -1880,9 +1880,9 @@ Public Function getvals() As String
 'ShowImageFileProperties ("C:\Users\indigonw\Documents\HTC\Gallery\ht26ys318579\phone storage\IMAG4760.jpg")
 'ShowImageFileProperties ("E:\Big_Rivers\2012\CURE\P7211545.JPG")
 
-    Dim d As Dictionary
-    
-    Set d = GetFileExifInfo("Z:\_____LIB\dev\git_projects\big_rivers_app\Data\P7231618.JPG")
+'    Dim d As Dictionary
+'
+'    Set d = GetFileExifInfo("Z:\_____LIB\dev\git_projects\big_rivers_app\Data\P7231618.JPG")
 
 End Function
 
@@ -1984,7 +1984,9 @@ Debug.Print "CurrentProject.FullName: " & CurrentProject.FullName
                     param = Split(ary2(j), ":")
                                         
                     If Not dictParam.Exists(param(0)) And Len(param(0)) <> 0 Then
-                        
+ 
+ Dim PARAM_SEPARATOR As String
+ 
                         'catch parameters not in paramname:type format
                         If UBound(param) <> 1 Then
                             DoCmd.OpenForm "MsgOverlay", acNormal, , , , acDialog, _
@@ -2026,6 +2028,8 @@ Debug.Print "CurrentProject.FullName: " & CurrentProject.FullName
         rs.MoveNext
     Loop
     
+Dim g_AppTemplates As Dictionary
+
     'load global AppTemplates As Scripting.Dictionary of Templates
     Set g_AppTemplates = Nothing    'clear first
     
@@ -2056,11 +2060,11 @@ Err_Handler:
 
             Dim qdf As DAO.QueryDef
             
-            If Not QueryExists("UsysTempQuery") Then
-                Set qdf = CurrentDb.CreateQueryDef("UsysTempQuery")
-            Else
-                Set qdf = CurrentDb.QueryDefs("UsysTempQuery")
-            End If
+'            If Not QueryExists("UsysTempQuery") Then
+'                Set qdf = CurrentDb.CreateQueryDef("UsysTempQuery")
+'            Else
+'                Set qdf = CurrentDb.QueryDefs("UsysTempQuery")
+'            End If
             
             qdf.SQL = strErrorSQL
             

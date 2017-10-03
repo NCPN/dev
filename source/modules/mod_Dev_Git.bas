@@ -44,7 +44,7 @@ Option Explicit
 ' Revisions:
 '   BLC - 2/12/2015 - initial version
 ' ---------------------------------
-Public Function ExportVBComponent(VBComp As VBIDE.VBComponent, _
+Public Function ExportVBComponent(vbComp As VBIDE.VBComponent, _
                 FolderName As String, _
                 Optional FileName As String, _
                 Optional OverwriteExisting As Boolean = True) As Boolean
@@ -58,9 +58,9 @@ On Error GoTo Err_Handler
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     Dim Extension As String
     Dim fName As String
-    Extension = GetFileExtension(VBComp:=VBComp)
+    Extension = GetFileExtension(vbComp:=vbComp)
     If Trim(FileName) = vbNullString Then
-        fName = VBComp.Name & Extension
+        fName = vbComp.Name & Extension
     Else
         fName = FileName
         If InStr(1, fName, ".", vbBinaryCompare) = 0 Then
@@ -74,7 +74,7 @@ On Error GoTo Err_Handler
         fName = FolderName & "\" & fName
     End If
     
-    If dir(fName, vbNormal + vbHidden + vbSystem) <> vbNullString Then
+    If Dir(fName, vbNormal + vbHidden + vbSystem) <> vbNullString Then
         If OverwriteExisting = True Then
             Kill fName
         Else
@@ -83,7 +83,7 @@ On Error GoTo Err_Handler
         End If
     End If
     
-    VBComp.Export FileName:=fName
+    vbComp.Export FileName:=fName
     ExportVBComponent = True
 
 Exit_Handler:
@@ -113,14 +113,14 @@ End Function
 ' Revisions:
 '   BLC - 2/12/2015 - initial version
 ' ---------------------------------
-Public Function GetFileExtension(VBComp As VBIDE.VBComponent) As String
+Public Function GetFileExtension(vbComp As VBIDE.VBComponent) As String
 On Error GoTo Err_Handler
     
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     ' This returns the appropriate file extension based on the Type of
     ' the VBComponent.
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        Select Case VBComp.Type
+        Select Case vbComp.Type
             Case vbext_ct_ClassModule
                 GetFileExtension = ".cls"
             Case vbext_ct_Document
@@ -152,7 +152,7 @@ End Function
 ' Parameters:   path - path to database file (string, optional)
 ' Returns:      -
 ' Throws:       none
-' References:   none
+' References:   IsBlank() from NCPN_framework mod_Validation
 ' Source/date:
 ' Arvin Meyer, June 2, 1999
 ' http://www.datastrat.com/Code/DocDatabase.txt
@@ -171,9 +171,9 @@ End Function
 ' ---------------------------------
 Public Sub DocDatabase(Optional Path As String = "")
     
-    If IsBlank(Path) Then
-        Path = Application.CurrentProject.Path & "\" & Application.CurrentProject.Name & " - exploded view\"
-    End If
+'    If IsBlank(Path) Then
+'        Path = Application.CurrentProject.Path & "\" & Application.CurrentProject.Name & " - exploded view\"
+'    End If
 
 On Error Resume Next
     MkDir Path
@@ -260,24 +260,24 @@ On Error GoTo Err_Handler
     Dim myFile As Object '??
     Dim Folder As Object '??
     Dim FSO As Object '??
-    Dim objecttype As String, objectname As String
+    Dim ObjectType As String, objectname As String
     Dim WScript As Object '??
     Dim oApplication As Object '??
     
     For Each myFile In Folder.Files
-        objecttype = FSO.GetExtensionName(myFile.Name)
+        ObjectType = FSO.GetExtensionName(myFile.Name)
         objectname = FSO.GetBaseName(myFile.Name)
-        WScript.Echo "  " & objectname & " (" & objecttype & ")"
+        WScript.Echo "  " & objectname & " (" & ObjectType & ")"
     
-        If (objecttype = "form") Then
+        If (ObjectType = "form") Then
             oApplication.LoadFromText acForm, objectname, myFile.Path
-        ElseIf (objecttype = "bas") Then
+        ElseIf (ObjectType = "bas") Then
             oApplication.LoadFromText acModule, objectname, myFile.Path
-        ElseIf (objecttype = "mac") Then
+        ElseIf (ObjectType = "mac") Then
             oApplication.LoadFromText acMacro, objectname, myFile.Path
-        ElseIf (objecttype = "report") Then
+        ElseIf (ObjectType = "report") Then
             oApplication.LoadFromText acReport, objectname, myFile.Path
-        ElseIf (objecttype = "sql") Then
+        ElseIf (ObjectType = "sql") Then
             oApplication.LoadFromText acQuery, objectname, myFile.Path
         End If
         
