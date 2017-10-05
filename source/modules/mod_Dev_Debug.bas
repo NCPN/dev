@@ -74,7 +74,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - ChangeMSysConnection[mod_Dev_Debug])"
     End Select
     Resume Exit_Handler
@@ -120,7 +120,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - ChangeMSysDb[mod_Dev_Debug])"
     End Select
     Resume Exit_Handler
@@ -165,7 +165,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - ChangeTSysDb[mod_Dev_Debug])"
     End Select
     Resume Exit_Handler
@@ -222,7 +222,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - SetDebugDbPaths[mod_Dev_Debug])"
     End Select
     Resume Exit_Handler
@@ -292,7 +292,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - DebugTest[mod_Dev_Debug])"
     End Select
     Resume Exit_Handler
@@ -333,7 +333,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - GetErrorTrappingOption[mod_Dev_Debug])"
     End Select
     Resume Exit_Handler
@@ -377,7 +377,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - SearchQueries[mod_Dev_Debug])"
     End Select
     Resume Exit_Handler
@@ -574,7 +574,7 @@ Err_Handler:
     Application.Echo True
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - SearchDB[mod_Dev_Debug])"
     End Select
     Debug.Assert False
@@ -623,7 +623,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - GetAppObj[mod_Dev_Debug])"
     End Select
     Resume Exit_Handler
@@ -656,7 +656,7 @@ On Error GoTo Err_Handler
     'check if Application object exists
     If Not appAccess Is Nothing Then
     
-        If varType(appAccess) = vbObject Then
+        If VarType(appAccess) = vbObject Then
         
             Set appAccess = Nothing
             
@@ -675,7 +675,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - RemoveAppObj[mod_Dev_Debug])"
     End Select
     Resume Exit_Handler
@@ -720,7 +720,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - RunVCS[mod_Dev_Debug])"
     End Select
     Resume Exit_Handler
@@ -826,7 +826,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - DeleteModule[mod_Dev_Debug])"
     End Select
     Resume Exit_Handler
@@ -895,7 +895,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - RemoveVCSModules[mod_Dev_Debug])"
     End Select
     Resume Exit_Handler
@@ -940,7 +940,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - AddModules[mod_Dev_Debug])"
     End Select
     Resume Exit_Handler
@@ -2050,7 +2050,7 @@ Err_Handler:
             "You can close the query after it runs (save it if you like)." & vbCrLf & vbCrLf & _
             "Please contact your data manager to resolve this issue." & vbCrLf & vbCrLf & _
             "Error #" & Err.Number & " - GetTemplates[mod_Db]:" & vbCrLf & _
-            Err.Description, vbExclamation, "Duplicate Db Template Found! [tsys_Db_Templates]"
+            Err.description, vbExclamation, "Duplicate Db Template Found! [tsys_Db_Templates]"
 
             Dim strErrorSQL As String
             strErrorSQL = "SELECT TemplateName, Count(TemplateName) AS NumberOfDupes " & _
@@ -2076,7 +2076,7 @@ Err_Handler:
             Stop
             
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - GetTemplates[mod_Dev_Debug])"
     End Select
     Resume Exit_Handler

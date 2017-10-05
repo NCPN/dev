@@ -92,7 +92,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - FixERD[mod_Dev_ERD])"
     End Select
     Resume Exit_Handler
@@ -146,7 +146,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - cmdCloseWindow_Click[mod_Dev_ERD])"
     End Select
     Resume Exit_Handler
@@ -240,7 +240,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - cmdFix_Click[mod_Dev_ERD])"
     End Select
     Resume Exit_Handler

@@ -116,7 +116,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - ExportObject[mod_Dev_Project])"
     End Select
     Resume Exit_Handler
@@ -182,7 +182,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - RemoveObject[mod_Dev_Project])"
     End Select
     Resume Exit_Handler
@@ -271,7 +271,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - ImportObject[mod_Dev_Project])"
     End Select
     Resume Exit_Handler
@@ -327,7 +327,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - ListObjects[mod_Dev_Project])"
     End Select
     Resume Exit_Handler

@@ -4,7 +4,7 @@ Option Explicit
 ' =================================
 ' MODULE:       mod_Dev_Documentation
 ' Level:        Development module
-' Version:      1.03
+' Version:      1.04
 '
 ' Description:  Debugging related functions & procedures for database documentation
 '
@@ -15,6 +15,7 @@ Option Explicit
 '               BLC - 9/27/2017 - 1.02 - moved to NCPN_dev
 '               BLC - 10/3/2017 - 1.03 - added ObjectType enum, GetObjectList(),
 '                                        GetProjectDetails() documentation
+'               BLC - 10/4/2017 - 1.04 - added module descriptions to GetProjectDetails()
 ' =================================
 
 ' ---------------------------------
@@ -105,7 +106,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - GetDescriptions[mod_Dev_Document])"
     End Select
     Resume Exit_Handler
@@ -253,7 +254,7 @@ Err_Handler:
 '        MsgBox tbl & " property doesn't exist", vbCritical, _
 '            "Error encountered (#" & Err.Number & " - TableInfo[mod_Dev_Document])"
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - TableInfo[mod_Dev_Document])"
     End Select
     Resume Exit_Handler
@@ -285,7 +286,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - GetDescrip[mod_Dev_Document])"
     End Select
     Resume Exit_Handler
@@ -360,7 +361,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - DocumentDb[mod_Dev_Document])"
     End Select
     Resume Exit_Handler
@@ -395,7 +396,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - GetDescrip[mod_Dev_Document])"
     End Select
     Resume Exit_Handler
@@ -441,7 +442,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - GetDescrip[mod_Dev_Document])"
     End Select
     Resume Exit_Handler
@@ -463,6 +464,7 @@ End Function
 ' Revisions:
 '   BLC - 9/29/2017 - initial version
 '   BLC - 10/3/2017 - adjusted header to include project description & date
+'   BLC - 10/4/2017 - added module descriptions
 ' ---------------------------------
 Public Function GetProjectDetails(Optional IncludeCounts As Boolean = False)
 On Error GoTo Err_Handler
@@ -476,6 +478,7 @@ On Error GoTo Err_Handler
     Dim FileNumber            As Integer
     Dim bFileClosed           As Boolean
     Dim strKind               As String
+    Dim description           As String
     Const vbNormalFocus = 1
     
     'documentation file
@@ -504,7 +507,7 @@ On Error GoTo Err_Handler
     For Each vbProj In Application.VBE.VBProjects
         Print #FileNumber, String(80, "*")
         Print #FileNumber, "VBA Project Name: " & Application.VBE.ActiveVBProject.Name
-        Print #FileNumber, "Description:      " & Application.VBE.ActiveVBProject.Description
+        Print #FileNumber, "Description:      " & Application.VBE.ActiveVBProject.description
         Print #FileNumber, String(80, "*")
 '        Print #FileNumber, "VBA Project Name: " & vbProj.Name
         
@@ -512,10 +515,20 @@ On Error GoTo Err_Handler
         For Each vbComp In vbProj.VBComponents
             Set vbMod = vbComp.CodeModule
             
+            'fetch description
+            Select Case TypeName(vbMod)
+                Case "CodeModule" 'module
+                    description = CurrentDb.Containers("Modules").Documents(vbMod).Properties("Description")
+                Case Else
+                    description = ""
+            End Select
+            
+            Print #FileNumber, "   " & String(77, "-")
             Print #FileNumber, "   " & vbComp.Name & _
                 IIf(IncludeCounts = True, " :: " & _
                     vbMod.CountOfLines & " total lines", "")
-            Print #FileNumber, "   " & String(80, "*")
+            Print #FileNumber, "   " & description
+            Print #FileNumber, "   " & String(77, "-")
             
             iCounter = 1
     
@@ -524,7 +537,6 @@ On Error GoTo Err_Handler
                 sProcName = vbMod.ProcOfLine(iCounter, pk)
                 
                 Select Case pk
-        
                     Case vbext_pk_Proc  'sub or function
                         strKind = "SUB / FUNCTION: "
                     Case vbext_pk_Get   'property get
@@ -547,7 +559,7 @@ On Error GoTo Err_Handler
                 End If
             Loop
             
-            Print #FileNumber, ""
+'            Print #FileNumber, ""
         Next vbComp
     Next vbProj
     
@@ -567,7 +579,7 @@ Exit_Handler:
 Err_Handler:
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - GetProjectDetails[mod_Dev_Document])"
     End Select
     Resume Exit_Handler
@@ -659,7 +671,7 @@ On Error GoTo Err_Handler
         'Print #FileNumber, ""
         Print #FileNumber, String(80, "=")
         Print #FileNumber, "VBA Project Name: " & Application.VBE.ActiveVBProject.Name
-        Print #FileNumber, "Description:      " & Application.VBE.ActiveVBProject.Description
+        Print #FileNumber, "Description:      " & Application.VBE.ActiveVBProject.description
         Print #FileNumber, String(80, "-")
         Print #FileNumber, "Database:         " & Application.CurrentProject.Name
         Print #FileNumber, "Db Path:          " & Application.CurrentProject.Path
@@ -686,7 +698,7 @@ Err_Handler:
     'Switch(Erl = 0, "", Erl <> 0, vbCrLf & "Line No: " & Erl)
     Select Case Err.Number
       Case Else
-        MsgBox "Error #" & Err.Number & ": " & Err.Description, vbCritical, _
+        MsgBox "Error #" & Err.Number & ": " & Err.description, vbCritical, _
             "Error encountered (#" & Err.Number & " - GetObjectList[mod_Dev_Document])"
     End Select
     Resume Exit_Handler
