@@ -460,11 +460,14 @@ End Function
 ' Source/date:
 '   Daniel Pineault (CARDA Consultants Inc., www.cardaconsultants.com), June 4, 2011
 '   https://www.devhut.net/2011/06/04/vba-vbe-enumerate-modules-procedures-and-line-count/
+'   Andre, October 20, 2017
+'   https://stackoverflow.com/questions/46842684/how-to-print-module-descriptions-from-vba/46844242#46844242
 ' Adapted:      Bonnie Campbell, September 29, 2017 - for NCPN tools
 ' Revisions:
 '   BLC - 9/29/2017 - initial version
 '   BLC - 10/3/2017 - adjusted header to include project description & date
 '   BLC - 10/4/2017 - added module descriptions
+'   BLC - 10/21/2017 - revised to print module
 ' ---------------------------------
 Public Function GetProjectDetails(Optional IncludeCounts As Boolean = False)
 On Error GoTo Err_Handler
@@ -518,7 +521,8 @@ On Error GoTo Err_Handler
             'fetch description
             Select Case TypeName(vbMod)
                 Case "CodeModule" 'module
-                    description = CurrentDb.Containers("Modules").Documents(vbMod).Properties("Description")
+'                    description = CurrentDb.Containers("Modules").Documents(vbMod).Properties("Description")
+                    description = Nz(CurrentDb.Containers("Modules").Documents(vbComp.Name).Properties("Description"), "")
                 Case Else
                     description = ""
             End Select
@@ -552,6 +556,11 @@ On Error GoTo Err_Handler
                         strKind & sProcName & _
                         IIf(IncludeCounts = True, " :: " & _
                             vbMod.ProcCountLines(sProcName, pk) & " lines", "")
+                    
+                    'print description
+                    
+                    'print parameters
+                    
                     
                     iCounter = iCounter + vbMod.ProcCountLines(sProcName, pk)
                 Else

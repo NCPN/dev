@@ -957,7 +957,7 @@ Public Sub moduletest()
     
 End Sub
 
-Public Function test()
+Public Function Test()
 
     'HandleDependentQueries "41", "run"
     'HandleDependentQueries "68,60,69,70,71,72,73,74,75", "run"
